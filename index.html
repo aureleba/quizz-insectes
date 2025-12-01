@@ -80,28 +80,18 @@
 <body>
 <header>Galerie d'abeilles + Quiz interactif</header>
 
-<section class="gallery">
-  <div class="img-card" onclick="alert('Image 1 cliquée !')">
-    <img src="https://placekitten.com/300/300" alt="Abeille 1" />
-  </div>
-  <div class="img-card" onclick="alert('Image 2 cliquée !')">
-    <img src="https://placekitten.com/301/300" alt="Abeille 2" />
-  </div>
-  <div class="img-card" onclick="alert('Image 3 cliquée !')">
-    <img src="https://placekitten.com/300/301" alt="Abeille 3" />
-  </div>
+<section id="interactive-image" style="text-align:center; padding:20px;">
+  <img src="insectes.jpg" usemap="#quizmap" style="max-width:100%; height:auto; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+
+  <map name="quizmap">
+    <!-- Zones larges à ajuster manuellement -->
+    <area shape="rect" coords="100,100,300,300" data-id="1" alt="zone1">
+    <area shape="rect" coords="350,120,550,320" data-id="2" alt="zone2">
+    <area shape="rect" coords="600,150,800,350" data-id="3" alt="zone3">
+  </map>
 </section>
 
-<section id="quiz-container">
-  <div class="question">
-    <h3>Quelle est la taille approximative d'une abeille domestique ?</h3>
-    <div class="choices">
-      <button onclick="answer(this, false)">2 mm</button>
-      <button onclick="answer(this, true)">12 mm</button>
-      <button onclick="answer(this, false)">40 mm</button>
-    </div>
-  </div>
-</section>
+
 
 <script>
   function answer(btn, isCorrect) {

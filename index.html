@@ -4,77 +4,135 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quiz Abeilles — Sélection Multiple</title>
+
 <style>
   body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
     background: #f7f7f7;
   }
+
   header {
     background: #ffcc33;
     padding: 20px;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: bold;
   }
+
+  /* CONTENEUR IMAGE */
   #interactive-image {
     position: relative;
-    text-align: center;
-    padding: 20px;
+    padding: 15px;
   }
+
   #interactive-image img {
-    max-width: 100%;
+    width: 100%;
     height: auto;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     display: block;
-    margin: 0 auto;
+    margin: auto;
   }
+
+  /* ZONES CLIQUABLES VISIBLES */
   .click-zone {
     position: absolute;
-    border: 2px solid red; 
+    border: 2px solid #ff5555;
+    border-radius: 12px;
+    opacity: 0.25;
     cursor: pointer;
-    border-radius: 8px;
-    opacity: 0.3; 
-    transition: background 0.2s, opacity 0.2s;
+    transition: 0.25s;
+    backdrop-filter: blur(2px);
   }
+
   .click-zone:hover {
-    background: rgba(255, 255, 0, 0.2);
+    opacity: 0.45;
+    background: rgba(255, 255, 0, 0.25);
   }
+
   .click-zone.selected {
-    background: rgba(0, 150, 255, 0.3);
-    border-color: blue;
+    border-color: #007bff;
+    background: rgba(0, 120, 255, 0.25);
+    opacity: 0.6;
   }
-  #quiz-result {
-    text-align: center;
-    font-size: 1.2rem;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  #validate-btn {
+
+  /* BOUTONS */
+  #validate-btn, #reset-btn {
     display: block;
-    margin: 15px auto;
-    padding: 10px 20px;
-    font-size: 1rem;
+    margin: 20px auto;
+    padding: 12px 26px;
+    font-size: 1.1rem;
     border: none;
     border-radius: 8px;
     background: #ffcc33;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: 0.2s;
   }
-  #validate-btn:hover {
+
+  #validate-btn:hover, #reset-btn:hover {
     background: #e6b800;
   }
+
+  #reset-btn {
+    display: none;
+    background: #ccc;
+  }
+
+  /* POPUP MESSAGE CENTRAL */
+  #final-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    width: min(90%, 450px);
+    opacity: 0;
+    transition: 0.3s;
+    text-align: center;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  #final-message.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+  }
+
+  #final-message h2 {
+    margin-top: 0;
+  }
+
+  /* SURCHARGE FOND GRIS */
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    z-index: 998;
+  }
+
+  #overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
 </style>
 </head>
 <body>
+
 <header>Trouvez les 2 mouches mimétiques innofensives parmi ces abeilles et guêpes</header>
 
 <section id="interactive-image">
-  <img src="insectes.jpg">
+  <img src="insectes.jpg" id="main-image">
 
-  <!-- Zones cliquables (11 zones exemple, positions fictives) -->
+  <!-- Zones cliquables -->
   <div class="click-zone" data-id="1" style="top:250px; left:300px; width:175px; height:300px;"></div>
   <div class="click-zone" data-id="2" style="top:300px; left:560px; width:180px; height:410px;"></div>
   <div class="click-zone" data-id="3" style="top:200px; left:840px; width:180px; height:260px;"></div>
@@ -89,59 +147,89 @@
 </section>
 
 <button id="validate-btn">Valider ma réponse</button>
-<div id="quiz-result"></div>
+<button id="reset-btn">Réessayer</button>
+
+<!-- POPUP -->
+<div id="overlay"></div>
+<div id="final-message"></div>
 
 <script>
+  const correctZones = ["4", "5"];  // syrphes corrects
   const zones = document.querySelectorAll('.click-zone');
   const validateBtn = document.getElementById('validate-btn');
-  const result = document.getElementById('quiz-result');
+  const resetBtn = document.getElementById('reset-btn');
+  const finalMsg = document.getElementById('final-message');
+  const overlay = document.getElementById('overlay');
 
-  // Id des zones correctes
-  const correctZones = ["4", "5"];
-  let selectedZones = [];
+  let selected = [];
 
-  // Gestion du clic sur les zones
   zones.forEach(zone => {
     zone.addEventListener('click', () => {
       const id = zone.dataset.id;
-      if(selectedZones.includes(id)) {
-        // Déselection
-        selectedZones = selectedZones.filter(z => z !== id);
+
+      if (selected.includes(id)) {
+        selected = selected.filter(x => x !== id);
         zone.classList.remove('selected');
       } else {
-        // Sélection
-        selectedZones.push(id);
+        selected.push(id);
         zone.classList.add('selected');
       }
     });
   });
 
-  // Validation
   validateBtn.addEventListener('click', () => {
-    if(selectedZones.length !== 2){
-      result.textContent = "⚠️ Sélectionnez exactement 2 zones.";
-      result.style.color = "orange";
+
+    if (selected.length !== 2) {
+      showPopup("⚠️ Sélectionnez exactement 2 zones.");
       return;
     }
 
-    const isCorrect = selectedZones.every(id => correctZones.includes(id)) 
-                      && correctZones.every(id => selectedZones.includes(id));
+    const isCorrect =
+      selected.every(id => correctZones.includes(id)) &&
+      correctZones.every(id => selected.includes(id));
 
-    if(isCorrect){
-      result.textContent = "✅ Bravo ! Vous avez trouvé les 2 mouches (Syrphidae), elles se reconnaissent à leur gros yeux et leur courtes antennes";
-      result.style.color = "green";
+    if (isCorrect) {
+      showPopup("<h2>Bravo ! 🎉</h2><p>Vous avez trouvé les 2 mouches (Syrphidae).<br> Elles se reconnaissent à leurs <b>gros yeux</b> et leurs <b>courtes antennes</b>.</p>");
     } else {
-      result.textContent = "❌ Incorrect. Les mouches sont : Volucella zonaria (en haut à droite) et Chrysotoxum elegans (au milieu à gauche), elles se reconnaissent à leur gros yeux et leur courtes antennes";
-      result.style.color = "red";
-      // Optionnel : montrer les bonnes zones
-      zones.forEach(zone => {
-        if(correctZones.includes(zone.dataset.id)) {
-          zone.style.background = "rgba(0, 255, 0, 0.3)";
-          zone.style.borderColor = "green";
-        }
-      });
+      showPopup("<h2>❌ Incorrect</h2><p>Les mouches étaient :<br><b>Volucella zonaria</b> (haut droite)<br><b>Chrysotoxum elegans</b> (milieu gauche)</p>");
     }
+
+    // Affichage corrects
+    zones.forEach(z => {
+      if (correctZones.includes(z.dataset.id)) {
+        z.style.borderColor = "lime";
+        z.style.background = "rgba(0,255,0,0.25)";
+        z.style.opacity = 0.6;
+      }
+    });
+
+    validateBtn.style.display = "none";
+    resetBtn.style.display = "block";
   });
+
+  resetBtn.addEventListener('click', resetQuiz);
+
+  function showPopup(content) {
+    finalMsg.innerHTML = content;
+    finalMsg.classList.add("visible");
+    overlay.classList.add("visible");
+  }
+
+  function resetQuiz() {
+    selected = [];
+    zones.forEach(z => {
+      z.classList.remove("selected");
+      z.style.borderColor = "#ff5555";
+      z.style.background = "transparent";
+      z.style.opacity = "0.25";
+    });
+
+    validateBtn.style.display = "block";
+    resetBtn.style.display = "none";
+
+    finalMsg.classList.remove("visible");
+    overlay.classList.remove("visible");
+  }
 </script>
 
 </body>

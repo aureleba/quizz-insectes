@@ -80,15 +80,13 @@
 <body>
 <header>Galerie d'abeilles + Quiz interactif</header>
 
-<section id="interactive-image" style="text-align:center; padding:20px;">
-  <img src="insectes.jpg" usemap="#quizmap" style="max-width:100%; height:auto; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+<section id="interactive-image" style="position:relative; text-align:center; padding:20px;">
+  <img src="insectes.jpg" style="max-width:100%; height:auto; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
 
-  <map name="quizmap">
-    <!-- Zones larges à ajuster manuellement -->
-    <area shape="rect" coords="100,100,300,300" data-id="1" alt="zone1">
-    <area shape="rect" coords="350,120,550,320" data-id="2" alt="zone2">
-    <area shape="rect" coords="600,150,800,350" data-id="3" alt="zone3">
-  </map>
+  <!-- Zones cliquables visibles -->
+  <div class="click-zone" style="position:absolute; top:100px; left:100px; width:200px; height:200px; border: 2px solid red;"></div>
+  <div class="click-zone" style="position:absolute; top:120px; left:350px; width:200px; height:200px; border: 2px solid green;"></div>
+  <div class="click-zone" style="position:absolute; top:150px; left:600px; width:200px; height:200px; border: 2px solid blue;"></div>
 </section>
 
 

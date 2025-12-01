@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Quiz – Cliquer sur les insectes</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background:#f5f5f5;
+        text-align:center;
+        margin:0;
+        padding:20px;
+    }
+    #container {
+        position: relative;
+        display: inline-block;
+    }
+    #quiz-image {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    .zone {
+        position:absolute;
+        cursor:pointer;
+        border: 2px solid rgba(0,0,0,0); /* invisible */
+    }
+    #feedback {
+        margin-top:20px;
+        font-size:20px;
+        font-weight:bold;
+    }
+</style>
+</head>
+<body>
+
+<h2>Quiz : Clique sur les bons insectes</h2>
+
+<div id="container">
+    <img id="quiz-image" src="insectes.jpg" alt="Insectes">
+</div>
+
+<div id="feedback"></div>
+
+<script>
+// ============================
+// CONFIGURATION DU QUIZ
+// ============================
+//
+// IMPORTANT : Tu vas modifier les coordinates ici.
+// Format des zones :
+// type: "rect",   x, y, w, h
+// type: "circle", x, y, r
+// "correct": true/false
+//
+// Exemple fictif (tu vas remplacer) :
+// { type:"rect", x:100, y:200, w:120, h:100, correct:true }
+//
+
+// --- LISTE DES ZONES (11 zones à remplacer par les tiennes) ---
+const zones = [
+    { type:"rect", x:100, y:80,  w:150, h:150, correct:false },
+    { type:"rect", x:300, y:80,  w:150, h:150, correct:false },
+    { type:"rect", x:500, y:80,  w:150, h:150, correct:false },
+
+    { type:"rect", x:100, y:300, w:150, h:150, correct:false },
+    { type:"rect", x:300, y:300, w:150, h:150, correct:false },
+    { type:"rect", x:500, y:300, w:150, h:150, correct:false },
+
+    { type:"rect", x:100, y:520, w:150, h:150, correct:false },
+    { type:"rect", x:300, y:520, w:150, h:150, correct:false },
+    { type:"rect", x:500, y:520, w:150, h:150, correct:false },
+
+    { type:"rect", x:350, y:700, w:150, h:150, correct:false },
+    { type:"rect", x:550, y:700, w:150, h:150, correct:false }
+];
+// Mets "correct:true" sur les 3 bons insectes.
+
+
+// =====================================================
+// CRÉATION AUTOMATIQUE DES ZONES CLIQUABLES
+// =====================================================
+window.onload = function() {
+    const container = document.getElementById("container");
+    const img = document.getElementById("quiz-image");
+
+    // attendre chargement image
+    img.addEventListener("load", () => {
+        const ratio = img.width / img.naturalWidth;
+
+        zones.forEach((z, index) => {
+            const div = document.createElement("div");
+            div.classList.add("zone");
+
+            if (z.type === "rect") {
+                div.style.left   = (z.x * ratio) + "px";
+                div.style.top    = (z.y * ratio) + "px";
+                div.style.width  = (z.w * ratio) + "px";
+                div.style.height = (z.h * ratio) + "px";
+            }
+
+            if (z.type === "circle") {
+                div.style.left   = (z.x - z.r) * ratio + "px";
+                div.style.top    = (z.y - z.r) * ratio + "px";
+                div.style.width  = (2 * z.r * ratio) + "px";
+                div.style.height = (2 * z.r * ratio) + "px";
+                div.style.borderRadius = "50%";
+            }
+
+            div.dataset.correct = z.correct;
+
+            div.addEventListener("click", () => {
+                const feedback = document.getElementById("feedback");
+                if (z.correct) {
+                    div.style.border = "2px solid green";
+                    feedback.textContent = "✓ Bonne réponse !";
+                    feedback.style.color = "green";
+                } else {
+                    div.style.border = "2px solid red";
+                    feedback.textContent = "✗ Mauvaise réponse";
+                    feedback.style.color = "red";
+                }
+            });
+
+            container.appendChild(div);
+        });
+    });
+};
+</script>
+
+</body>
+</html>

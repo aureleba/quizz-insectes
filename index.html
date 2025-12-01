@@ -69,7 +69,7 @@
 </style>
 </head>
 <body>
-<header>Galerie d'abeilles + Quiz interactif</header>
+<header>Trouvez les 2 mouches mimétiques innofensives parmi ces abeilles et guêpes</header>
 
 <section id="interactive-image">
   <img src="insectes.jpg">
@@ -84,8 +84,8 @@
   <div class="click-zone" data-id="7" style="top:690px; left:920px; width:210px; height:300px;"></div>
   <div class="click-zone" data-id="8" style="top:1050px; left:640px; width:180px; height:250px;"></div>
   <div class="click-zone" data-id="9" style="top:950px; left:1130px; width:180px; height:300px;"></div>
-  <div class="click-zone" data-id="10" style="top:1300px; left:400px; width:180px; height:200px;"></div>
-  <div class="click-zone" data-id="11" style="top:1300px; left:900px; width:180px; height:210px;"></div>
+  <div class="click-zone" data-id="10" style="top:1300px; left:410px; width:180px; height:200px;"></div>
+  <div class="click-zone" data-id="11" style="top:1300px; left:880px; width:180px; height:220px;"></div>
 </section>
 
 <button id="validate-btn">Valider ma réponse</button>
@@ -128,10 +128,10 @@
                       && correctZones.every(id => selectedZones.includes(id));
 
     if(isCorrect){
-      result.textContent = "✅ Bravo ! Vous avez trouvé les bonnes zones.";
+      result.textContent = "✅ Bravo ! Vous avez trouvé les 2 mouches (Syrphidae)";
       result.style.color = "green";
     } else {
-      result.textContent = "❌ Incorrect. Les bonnes zones sont : " + correctZones.join(", ");
+      result.textContent = "❌ Incorrect. Les mouches sont : Volucella zonaria (en haut à droite) et Chrysotoxum elegans (au milieu à gauche)" + correctZones.join(", ");
       result.style.color = "red";
       // Optionnel : montrer les bonnes zones
       zones.forEach(zone => {

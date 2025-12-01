@@ -128,10 +128,10 @@
                       && correctZones.every(id => selectedZones.includes(id));
 
     if(isCorrect){
-      result.textContent = "✅ Bravo ! Vous avez trouvé les 2 mouches (Syrphidae)";
+      result.textContent = "✅ Bravo ! Vous avez trouvé les 2 mouches (Syrphidae), elles se reconnaissent à leur gros yeux et leur courtes antennes";
       result.style.color = "green";
     } else {
-      result.textContent = "❌ Incorrect. Les mouches sont : Volucella zonaria (en haut à droite) et Chrysotoxum elegans (au milieu à gauche)";
+      result.textContent = "❌ Incorrect. Les mouches sont : Volucella zonaria (en haut à droite) et Chrysotoxum elegans (au milieu à gauche), elles se reconnaissent à leur gros yeux et leur courtes antennes";
       result.style.color = "red";
       // Optionnel : montrer les bonnes zones
       zones.forEach(zone => {

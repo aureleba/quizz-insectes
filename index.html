@@ -2,39 +2,75 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Quiz – Cliquer sur les insectes</title>
+<title>Quiz – Insectes cliquables</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
     body {
         font-family: Arial, sans-serif;
         background:#f5f5f5;
         text-align:center;
         margin:0;
-        padding:20px;
+        padding:15px;
     }
     #container {
         position: relative;
         display: inline-block;
+        max-width: 100%;
+        touch-action: manipulation;
     }
     #quiz-image {
-        max-width:100%;
+        width:100%;
         height:auto;
         display:block;
     }
+
+    /* Zone invisible mais interactive */
     .zone {
         position:absolute;
         cursor:pointer;
-        border: 2px solid rgba(0,0,0,0);
+        border:2px solid rgba(0,0,0,0);
+        transition: all 0.2s ease;
+        border-radius:6px;
     }
+
+    /* Effet survol (desktop) */
+    @media (hover:hover) {
+        .zone:hover {
+            border:2px solid rgba(0,150,255,0.7);
+            box-shadow: 0 0 10px rgba(0,150,255,0.7);
+        }
+    }
+
+    /* Animation clic correct */
+    .correct-flash {
+        animation: flashGreen 0.5s ease;
+    }
+    @keyframes flashGreen {
+        0% { box-shadow:0 0 20px rgba(0,255,0,0.9); }
+        100% { box-shadow:0 0 0 rgba(0,255,0,0); }
+    }
+
+    /* Animation clic faux */
+    .wrong-flash {
+        animation: flashRed 0.5s ease;
+    }
+    @keyframes flashRed {
+        0% { box-shadow:0 0 20px rgba(255,0,0,0.9); }
+        100% { box-shadow:0 0 0 rgba(255,0,0,0); }
+    }
+
     #feedback {
         margin-top:20px;
         font-size:22px;
         font-weight:bold;
     }
 </style>
+
 </head>
 <body>
 
-<h2>Quiz : Clique sur les bons insectes (3 à trouver)</h2>
+<h2>Quiz : Trouve les 2 bons insectes</h2>
 
 <div id="container">
     <img id="quiz-image" src="insectes.jpg" alt="Insectes">
@@ -43,48 +79,48 @@
 <div id="feedback"></div>
 
 <script>
-// =============== CONFIGURATION ===============
-
-// 11 zones avec coordonnées approximatives
-// Mets correct:true pour les 3 bonnes réponses
-
+// =====================================================
+//       CONFIGURATION DES ZONES (à ajuster si besoin)
+// =====================================================
 const zones = [
-    { x:150, y:80,  w:230, h:220, correct:false },   // Scolia hirta
-    { x:440, y:80,  w:260, h:260, correct:true  },   // Megascolia maculata ✔
-    { x:800, y:120, w:170, h:200, correct:false },   // Bombus hortorum
-    { x:1020,y:160, w:180, h:240, correct:false },   // Volucella zonaria
+    { x:150, y:80,  w:230, h:220, correct:false },
+    { x:440, y:80,  w:260, h:260, correct:false  },
+    { x:800, y:120, w:170, h:200, correct:false },
+    { x:1020,y:160, w:180, h:240, correct:true },
 
-    { x:150, y:390, w:200, h:230, correct:false },   // Chrysotoxum elegans
-    { x:490, y:370, w:170, h:210, correct:true  },   // Apis mellifera ✔
-    { x:840, y:400, w:170, h:260, correct:false },   // Delta unguiculatum
+    { x:150, y:390, w:200, h:230, correct:true },
+    { x:490, y:370, w:170, h:210, correct:false  },
+    { x:840, y:400, w:170, h:260, correct:false },
 
-    { x:500, y:670, w:220, h:230, correct:false },   // Anthidium florentinum
-    { x:900, y:630, w:280, h:300, correct:true  },   // Vespa crabro ✔
-    { x:160, y:670, w:160, h:210, correct:false },   // Vespula vulgaris
-    { x:850, y:900, w:200, h:260, correct:false }    // Sphex funerarius
+    { x:500, y:670, w:220, h:230, correct:false },
+    { x:900, y:630, w:280, h:300, correct:false  },
+    { x:160, y:670, w:160, h:210, correct:false },
+    { x:850, y:900, w:200, h:260, correct:false }
 ];
 
 let score = 0;
 let gameOver = false;
 
 
-// =============== CREATION DES ZONES ===============
-
+// =====================================================
+//       CREATION DES ZONES CLIQUABLES RESPONSIVES
+// =====================================================
 window.onload = function() {
     const container = document.getElementById("container");
     const img = document.getElementById("quiz-image");
 
     img.addEventListener("load", () => {
-        const ratio = img.width / img.naturalWidth;
+        const scale = img.width / img.naturalWidth;
 
-        zones.forEach((z) => {
+        zones.forEach(z => {
             const div = document.createElement("div");
             div.classList.add("zone");
 
-            div.style.left = (z.x * ratio) + "px";
-            div.style.top = (z.y * ratio) + "px";
-            div.style.width = (z.w * ratio) + "px";
-            div.style.height = (z.h * ratio) + "px";
+            // Dimensions scalées automatiquement
+            div.style.left   = (z.x * scale) + "px";
+            div.style.top    = (z.y * scale) + "px";
+            div.style.width  = (z.w * scale) + "px";
+            div.style.height = (z.h * scale) + "px";
 
             div.dataset.correct = z.correct;
 
@@ -93,20 +129,22 @@ window.onload = function() {
 
                 const feedback = document.getElementById("feedback");
 
-                if (z.correct === true) {
+                if (z.correct) {
                     score++;
                     div.style.border = "3px solid green";
+                    div.classList.add("correct-flash");
                     div.style.pointerEvents = "none";
-                    feedback.textContent = `Bonne réponse ! Score : ${score}/3`;
+                    feedback.textContent = `Bonne réponse ! Score : ${score}/2`;
                     feedback.style.color = "green";
 
-                    if (score === 3) {
+                    if (score === 2) {
                         gameOver = true;
-                        feedback.textContent = "🎉 Bravo ! Vous avez trouvé les 3 bons insectes.";
+                        feedback.textContent = "🎉 Bravo ! Vous avez trouvé les 2 bons insectes !";
                     }
                 } else {
                     div.style.border = "3px solid red";
-                    feedback.textContent = "Mauvaise réponse…";
+                    div.classList.add("wrong-flash");
+                    feedback.textContent = "❌ Mauvaise réponse";
                     feedback.style.color = "red";
                 }
             });

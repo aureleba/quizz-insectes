@@ -18,87 +18,70 @@
     font-size: 1.5rem;
     font-weight: bold;
   }
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    padding: 20px;
-  }
-  .img-card {
+  #interactive-image {
     position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    border-radius: 12px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .img-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  }
-  .img-card img {
-    width: 100%;
-    display: block;
-  }
-
-  /* Quiz */
-  #quiz-container {
+    text-align: center;
     padding: 20px;
   }
-  .question {
-    background: white;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  #interactive-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    display: block;
+    margin: 0 auto;
   }
-  .question h3 {
-    font-size: 1.1rem;
-  }
-  .choices button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border: none;
+  .click-zone {
+    position: absolute;
+    border: 2px solid red; /* contour visible */
+    cursor: pointer;
     border-radius: 8px;
-    font-size: 1rem;
-    background: #eee;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
+    opacity: 0.3; /* zones semi-transparent */
   }
-  .choices button:hover {
-    background: #ddd;
+  .click-zone:hover {
+    background: rgba(255, 255, 0, 0.2);
   }
-  .choices button.correct {
-    background: #8bc34a !important;
-    color: white;
-  }
-  .choices button.wrong {
-    background: #e57373 !important;
-    color: white;
+  #quiz-result {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 15px;
+    font-weight: bold;
   }
 </style>
 </head>
 <body>
 <header>Galerie d'abeilles + Quiz interactif</header>
 
-<section id="interactive-image" style="position:relative; text-align:center; padding:20px;">
-  <img src="insectes.jpg" style="max-width:100%; height:auto; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+<section id="interactive-image">
+  <img src="insectes.jpg">
 
-  <!-- Zones cliquables visibles -->
-  <div class="click-zone" style="position:absolute; top:100px; left:100px; width:200px; height:200px; border: 2px solid red;"></div>
-  <div class="click-zone" style="position:absolute; top:120px; left:350px; width:200px; height:200px; border: 2px solid green;"></div>
-  <div class="click-zone" style="position:absolute; top:150px; left:600px; width:200px; height:200px; border: 2px solid blue;"></div>
+  <!-- Zones cliquables -->
+  <div class="click-zone" data-id="1" style="top:100px; left:100px; width:200px; height:200px;"></div>
+  <div class="click-zone" data-id="2" style="top:120px; left:350px; width:200px; height:200px; border-color:green;"></div>
+  <div class="click-zone" data-id="3" style="top:150px; left:600px; width:200px; height:200px; border-color:blue;"></div>
 </section>
 
-
+<div id="quiz-result"></div>
 
 <script>
-  function answer(btn, isCorrect) {
-    if (isCorrect) {
-      btn.classList.add('correct');
-    } else {
-      btn.classList.add('wrong');
-    }
-  }
+  const zones = document.querySelectorAll('.click-zone');
+  const result = document.getElementById('quiz-result');
+
+  // Définir quelle zone est correcte (ici exemple : zone 2)
+  const correctZoneId = "2";
+
+  zones.forEach(zone => {
+    zone.addEventListener('click', () => {
+      if(zone.dataset.id === correctZoneId){
+        result.textContent = "✅ Correct !";
+        result.style.color = "green";
+      } else {
+        result.textContent = "❌ Incorrect, essayez encore.";
+        result.style.color = "red";
+      }
+    });
+  });
 </script>
 </body>
 </html>

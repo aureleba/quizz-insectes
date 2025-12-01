@@ -1,159 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Quiz – Insectes cliquables</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Site Abeilles — Galerie + Quiz</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background:#f5f5f5;
-        text-align:center;
-        margin:0;
-        padding:15px;
-    }
-    #container {
-        position: relative;
-        display: inline-block;
-        max-width: 100%;
-        touch-action: manipulation;
-    }
-    #quiz-image {
-        width:100%;
-        height:auto;
-        display:block;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f7f7;
+  }
+  header {
+    background: #ffcc33;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
+  .img-card {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .img-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+  .img-card img {
+    width: 100%;
+    display: block;
+  }
 
-    /* Zone invisible mais interactive */
-    .zone {
-        position:absolute;
-        cursor:pointer;
-        border:2px solid rgba(0,0,0,0);
-        transition: all 0.2s ease;
-        border-radius:6px;
-    }
-
-    /* Effet survol (desktop) */
-    @media (hover:hover) {
-        .zone:hover {
-            border:2px solid rgba(0,150,255,0.7);
-            box-shadow: 0 0 10px rgba(0,150,255,0.7);
-        }
-    }
-
-    /* Animation clic correct */
-    .correct-flash {
-        animation: flashGreen 0.5s ease;
-    }
-    @keyframes flashGreen {
-        0% { box-shadow:0 0 20px rgba(0,255,0,0.9); }
-        100% { box-shadow:0 0 0 rgba(0,255,0,0); }
-    }
-
-    /* Animation clic faux */
-    .wrong-flash {
-        animation: flashRed 0.5s ease;
-    }
-    @keyframes flashRed {
-        0% { box-shadow:0 0 20px rgba(255,0,0,0.9); }
-        100% { box-shadow:0 0 0 rgba(255,0,0,0); }
-    }
-
-    #feedback {
-        margin-top:20px;
-        font-size:22px;
-        font-weight:bold;
-    }
+  /* Quiz */
+  #quiz-container {
+    padding: 20px;
+  }
+  .question {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .question h3 {
+    font-size: 1.1rem;
+  }
+  .choices button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #eee;
+    transition: background 0.2s;
+  }
+  .choices button:hover {
+    background: #ddd;
+  }
+  .choices button.correct {
+    background: #8bc34a !important;
+    color: white;
+  }
+  .choices button.wrong {
+    background: #e57373 !important;
+    color: white;
+  }
 </style>
-
 </head>
 <body>
+<header>Galerie d'abeilles + Quiz interactif</header>
 
-<h2>Quiz : Trouve les 2 bons insectes</h2>
+<section class="gallery">
+  <div class="img-card" onclick="alert('Image 1 cliquée !')">
+    <img src="https://placekitten.com/300/300" alt="Abeille 1" />
+  </div>
+  <div class="img-card" onclick="alert('Image 2 cliquée !')">
+    <img src="https://placekitten.com/301/300" alt="Abeille 2" />
+  </div>
+  <div class="img-card" onclick="alert('Image 3 cliquée !')">
+    <img src="https://placekitten.com/300/301" alt="Abeille 3" />
+  </div>
+</section>
 
-<div id="container">
-    <img id="quiz-image" src="insectes.jpg" alt="Insectes">
-</div>
-
-<div id="feedback"></div>
+<section id="quiz-container">
+  <div class="question">
+    <h3>Quelle est la taille approximative d'une abeille domestique ?</h3>
+    <div class="choices">
+      <button onclick="answer(this, false)">2 mm</button>
+      <button onclick="answer(this, true)">12 mm</button>
+      <button onclick="answer(this, false)">40 mm</button>
+    </div>
+  </div>
+</section>
 
 <script>
-// =====================================================
-//       CONFIGURATION DES ZONES (à ajuster si besoin)
-// =====================================================
-const zones = [
-    { x:150, y:80,  w:230, h:220, correct:false },
-    { x:440, y:80,  w:260, h:260, correct:false  },
-    { x:800, y:120, w:170, h:200, correct:false },
-    { x:1020,y:160, w:180, h:240, correct:true },
-
-    { x:150, y:390, w:200, h:230, correct:true },
-    { x:490, y:370, w:170, h:210, correct:false  },
-    { x:840, y:400, w:170, h:260, correct:false },
-
-    { x:500, y:670, w:220, h:230, correct:false },
-    { x:900, y:630, w:280, h:300, correct:false  },
-    { x:160, y:670, w:160, h:210, correct:false },
-    { x:850, y:900, w:200, h:260, correct:false }
-];
-
-let score = 0;
-let gameOver = false;
-
-
-// =====================================================
-//       CREATION DES ZONES CLIQUABLES RESPONSIVES
-// =====================================================
-window.onload = function() {
-    const container = document.getElementById("container");
-    const img = document.getElementById("quiz-image");
-
-    img.addEventListener("load", () => {
-        const scale = img.width / img.naturalWidth;
-
-        zones.forEach(z => {
-            const div = document.createElement("div");
-            div.classList.add("zone");
-
-            // Dimensions scalées automatiquement
-            div.style.left   = (z.x * scale) + "px";
-            div.style.top    = (z.y * scale) + "px";
-            div.style.width  = (z.w * scale) + "px";
-            div.style.height = (z.h * scale) + "px";
-
-            div.dataset.correct = z.correct;
-
-            div.addEventListener("click", () => {
-                if (gameOver) return;
-
-                const feedback = document.getElementById("feedback");
-
-                if (z.correct) {
-                    score++;
-                    div.style.border = "3px solid green";
-                    div.classList.add("correct-flash");
-                    div.style.pointerEvents = "none";
-                    feedback.textContent = `Bonne réponse ! Score : ${score}/2`;
-                    feedback.style.color = "green";
-
-                    if (score === 2) {
-                        gameOver = true;
-                        feedback.textContent = "🎉 Bravo ! Vous avez trouvé les 2 bons insectes !";
-                    }
-                } else {
-                    div.style.border = "3px solid red";
-                    div.classList.add("wrong-flash");
-                    feedback.textContent = "❌ Mauvaise réponse";
-                    feedback.style.color = "red";
-                }
-            });
-
-            container.appendChild(div);
-        });
-    });
-};
+  function answer(btn, isCorrect) {
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+    }
+  }
 </script>
-
 </body>
 </html>
